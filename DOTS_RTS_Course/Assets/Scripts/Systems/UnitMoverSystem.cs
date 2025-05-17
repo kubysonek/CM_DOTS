@@ -8,21 +8,17 @@ partial struct UnitMoverSystem : ISystem {
     
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
-        foreach ((RefRW<LocalTransform> localTransform, RefRO<MoveSpeed> moveSpeed, RefRW<PhysicsVelocity> physicsVelocity)
-                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<MoveSpeed>, RefRW<PhysicsVelocity>>()) {
+        foreach ((RefRW<LocalTransform> localTransform, RefRO<UnitMover> unitMover, RefRW<PhysicsVelocity> physicsVelocity)
+                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<UnitMover>, RefRW<PhysicsVelocity>>()) {
 
-            float3 targetPosition = MouseWorldPosition.Instance.GetPosition();
-            float3 moveDirection = targetPosition - localTransform.ValueRO.Position;
-
+            float3 moveDirection = unitMover.ValueRO.targetPosition - localTransform.ValueRO.Position;
             moveDirection = math.normalize(moveDirection);
-
-            float rotationSpeed = 10f;
+            
             localTransform.ValueRW.Rotation = math.slerp(localTransform.ValueRO.Rotation, quaternion.LookRotation(moveDirection, math.up()),
-                SystemAPI.Time.DeltaTime * rotationSpeed);
+                SystemAPI.Time.DeltaTime * unitMover.ValueRO.rotationSpeed);
 
-            physicsVelocity.ValueRW.Linear = moveDirection * moveSpeed.ValueRO.value;
+            physicsVelocity.ValueRW.Linear = moveDirection * unitMover.ValueRO.moveSpeed;
             physicsVelocity.ValueRW.Angular = float3.zero;
-            // localTransform.ValueRW.Position += moveDirection * moveSpeed.ValueRO.value * SystemAPI.Time.DeltaTime;
         }
     }
 }
