@@ -50,7 +50,7 @@ public partial struct UnitMoverJob : IJobEntity {
         
         float3 moveDirection = unitMover.targetPosition - localTransform.Position;
             
-        float reachedTargetDistanceSq = 1f;
+        float reachedTargetDistanceSq = 2f;
         if (math.lengthsq(moveDirection)< reachedTargetDistanceSq) {
             //Reached target position
             physicsVelocity.Linear = float3.zero;
